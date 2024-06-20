@@ -8,23 +8,27 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
-func initTracer() (trace.TracerProvider, error) {
-	exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
+func initTracer() (*trace.TracerProvider, error) {
+	exporter, err := stdouttrace.New(
+		stdouttrace.WithPrettyPrint(),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),
-		sdktrace.WithResource(resource.Default()),
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("my-service"),
+		)),
 	)
 
 	otel.SetTracerProvider(tp)
-
 	return tp, nil
 }
 
@@ -33,14 +37,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err := tp.Shutdown(); err != nil {
-			panic(err)
-		}
-	}()
+	defer func() { _ = tp.Shutdown(ctx) }()
 
 	r := gin.Default()
-
 	r.Use(otelgin.Middleware("my-service"))
 
 	r.GET("/ping", func(c *gin.Context) {
