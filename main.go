@@ -18,6 +18,11 @@ func main() {
 		w.Write([]byte("Welcome to the profile page!"))
 	})
 
+	r.Get("/api/profile/{username}", func(w http.ResponseWriter, r *http.Request) {
+		username := chi.URLParam(r, "username")
+		w.Write([]byte("Username: " + username))
+	})
+
 	// Start the server
 	http.ListenAndServe(":8080", r)
 }
