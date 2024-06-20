@@ -3,21 +3,36 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := chi.NewRouter()
+	r := gin.Default()
 
-	// Routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to the home page!"))
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
 	})
 
-	r.Get("/api/profile", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to the profile page!"))
+	r.GET("/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello World",
+		})
 	})
 
-	// Start the server
-	http.ListenAndServe(":8080", r)
+	r.GET("/api/profile", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello World",
+		})
+	})
+
+	r.GET("/api/profile/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		c.JSON(http.StatusOK, gin.H{
+			"id": id,
+		})
+	})
+
+	r.Run() // listen and serve on 8080
 }
