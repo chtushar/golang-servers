@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -24,5 +25,5 @@ func main() {
 	})
 
 	// Start the server
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":8080", otelhttp.NewHandler(r, "server"))
 }
