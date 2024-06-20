@@ -2,7 +2,10 @@ module golang-servers
 
 go 1.22.3
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/gin-gonic/gin v1.10.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.42.0
+)
 
 require (
 	github.com/bytedance/sonic v1.11.9 // indirect
